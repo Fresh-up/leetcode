@@ -1,32 +1,31 @@
 class Solution {
 public:
     vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
-        int left = newInterval[0];
-        int right = newInterval[1];
-        bool placed = false;
+        int ll = newInterval[0], rr = newInterval[1];
         vector<vector<int>> ans;
-        for (const auto& interval: intervals) {
-            if (interval[0] > right) {
-                // 在插入区间的右侧且无交集
+        bool placed = false;
+        for (const auto& in : intervals) {
+            if (in[0] > rr) {
+                // 说明该区间在新区间的右边
                 if (!placed) {
-                    ans.push_back({left, right});
-                    placed = true;                    
-                }
-                ans.push_back(interval);
+                    ans.push_back({ll, rr});
+                    placed = true;
+                } 
+                // 不能添加else,否则第一个没有交集的区间就不能插入
+                ans.emplace_back(in);
             }
-            else if (interval[1] < left) {
-                // 在插入区间的左侧且无交集
-                ans.push_back(interval);
+            else if (in[1] < ll) {
+                // 说明该区间在新区间的左边
+                ans.emplace_back(in);
             }
             else {
-                // 与插入区间有交集，计算它们的并集
-                left = min(left, interval[0]);
-                right = max(right, interval[1]);
+                ll = min(ll, in[0]);
+                rr = max(rr, in[1]);
             }
         }
-        if (!placed) {
-            ans.push_back({left, right});
-        }
+        // 遍历到最后还没有放置新区间，说明新区间在最后并不与给定区间交集
+        if (!placed) ans.push_back({ll, rr});
         return ans;
     }
 };
+// O(n) O(1)
